@@ -41,18 +41,8 @@ jobs:
       id: extract
       run: |
         # Debug: Check what we're getting from the API
+
         echo "Raw PR data:"
-        echo "${{ steps.pr.outputs.data }}"
-        
-        # Save the data and validate JSON
-        echo "${{ steps.pr.outputs.data }}" > pr.json
-        
-        # Check if the JSON is valid
-        if ! jq empty pr.json 2>/dev/null; then
-          echo "Error: Invalid JSON received from API"
-          cat pr.json
-          exit 1
-        fi
         
         # Extract data with error handling
         MERGE_COMMIT=$(jq -r '.merge_commit_sha // "null"' pr.json)
