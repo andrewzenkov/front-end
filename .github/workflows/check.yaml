@@ -43,6 +43,11 @@ jobs:
               body: pr.data.body
             });
 
+            echo "base=${pr.data.base.ref}" >> $GITHUB_OUTPUT
+            echo "head=${pr.data.head.ref}" >> $GITHUB_OUTPUT
+            echo "title=${pr.data.title}" >> $GITHUB_OUTPUT
+            echo "body=${pr.data.body}" >> $GITHUB_OUTPUT
+
             return {
               base: pr.data.base.ref,
               head: pr.data.head.ref,
@@ -56,7 +61,12 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+          echo "=== PR Object Output ==="
           echo "base: ${{ steps.pr.outputs.base }}"
+          echo "head: ${{ steps.pr.outputs.head }}"
+          echo "title: ${{ steps.pr.outputs.title }}"
+          echo "body: ${{ steps.pr.outputs.body }}"
+          echo "========================"
 
           git fetch --unshallow origin main
           git checkout ${{ steps.pr.outputs.base }}
