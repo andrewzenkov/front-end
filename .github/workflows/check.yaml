@@ -44,7 +44,7 @@ jobs:
             })
 
       - name: Output PR info 1
-        run: echo "${{ steps.pr.outputs.result }}"
+        run: echo "${{ steps.pr.outputs.result.base }}"
 
       - name: Create squash merge commit
         id: squash
