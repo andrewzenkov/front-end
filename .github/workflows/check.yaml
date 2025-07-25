@@ -53,10 +53,13 @@ jobs:
 
           echo "PR INFO: $pr_info"
 
+          pr_info=$(echo "$raw" | jq -r '.')
+
           base=$(echo "$pr_info" | jq -r '.base')
           head=$(echo "$pr_info" | jq -r '.head')
           title=$(echo "$pr_info" | jq -r '.title')
           body=$(echo "$pr_info" | jq -r '.body')
+
 
           echo "base: $base"
           echo "head: $head"
