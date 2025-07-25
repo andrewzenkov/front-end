@@ -86,15 +86,15 @@ jobs:
           
           # Create new branch from patch branch
           echo "Creating new branch from patch branch..."
-          git fetch origin test-patch:test-patch
-          git checkout test-patch
+          git fetch origin patch/v0.1:patch/v0.1
+          git checkout patch/v0.1
           git checkout -b newBranch
           
           # Push the new branch
           git cherry-pick $mergeCommitSha
           git push origin newBranch
           
-          echo "New branch 'newBranch' created from 'test-patch' branch"
+          echo "New branch 'newBranch' created from 'patch/v0.1' branch"
           
       - name: Create PR
         uses: actions/github-script@v7
@@ -103,9 +103,9 @@ jobs:
             await github.rest.pulls.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: 'New branch from test-patch',
+              title: 'New branch from patch/v0.1',
               head: 'newBranch',
-              base: 'test-patch',
+              base: 'patch/v0.1',
               body: 'This PR was created automatically from the patch branch'
             });
 
