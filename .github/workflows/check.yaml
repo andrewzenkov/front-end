@@ -1,3 +1,4 @@
+
 name: Show Squashed Merge Commit on PR Comment
 
 on:
@@ -24,7 +25,6 @@ jobs:
       - name: Fetch base branch
         run: |
           git fetch origin ${{ github.event.pull_request.base.ref }}:${{ github.event.pull_request.base.ref }}
-
       - name: Get PR info
         id: pr
         uses: actions/github-script@v7
@@ -35,7 +35,6 @@ jobs:
               repo: context.repo.repo,
               pull_number: context.issue.number
             });
-
             return JSON.stringify({
               base: pr.data.base.ref,
               head: pr.data.head.ref,
@@ -53,14 +52,11 @@ jobs:
 
           echo "PR INFO: $pr_info"
 
-          pr_info=$(echo "$raw" | jq -r '.')
-
           base=$(echo "$pr_info" | jq -r '.base')
           head=$(echo "$pr_info" | jq -r '.head')
           title=$(echo "$pr_info" | jq -r '.title')
           body=$(echo "$pr_info" | jq -r '.body')
-
-
+          
           echo "base: $base"
           echo "head: $head"
           echo "title: $title"
@@ -68,9 +64,6 @@ jobs:
 
           git fetch --unshallow origin main
           git checkout $base
-          git pull origin $base
-
-
       - name: Show squashed commit
         run: |
           git show ${{ steps.squash.outputs.commit_sha }}
