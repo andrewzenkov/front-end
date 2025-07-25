@@ -43,24 +43,28 @@ jobs:
               body: pr.data.body
             })
 
-      - name: Output PR info 1
-        run: echo "${{ steps.pr.outputs.result.base }}"
-
       - name: Create squash merge commit
         id: squash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          echo "=== PR Object Output ==="
-          echo "base: ${{ steps.pr.outputs.base }}"
-          echo "head: ${{ steps.pr.outputs.head }}"
-          echo "title: ${{ steps.pr.outputs.title }}"
-          echo "body: ${{ steps.pr.outputs.body }}"
-          echo "========================"
+          pr_info='${{ steps.pr.outputs.result }}'
+
+          echo "PR INFO: $pr_info"
+
+          base=$(echo "$pr_info" | jq -r '.base')
+          head=$(echo "$pr_info" | jq -r '.head')
+          title=$(echo "$pr_info" | jq -r '.title')
+          body=$(echo "$pr_info" | jq -r '.body')
+
+          echo "base: $base"
+          echo "head: $head"
+          echo "title: $title"
+          echo "body: $body"
 
           git fetch --unshallow origin main
-          git checkout ${{ steps.pr.outputs.base }}
+          git checkout $base
           git merge --squash ${{ steps.pr.outputs.head }}
           git commit -m "${{ steps.pr.outputs.title }}" -m "${{ steps.pr.outputs.body }}"
           echo "commit_sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
