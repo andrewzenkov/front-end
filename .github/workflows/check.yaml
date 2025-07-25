@@ -60,6 +60,7 @@ jobs:
           title=$(echo "$pr_info" | jq -r '.title')
           body=$(echo "$pr_info" | jq -r '.body')
 
+
           echo "base: $base"
           echo "head: $head"
           echo "title: $title"
@@ -67,11 +68,7 @@ jobs:
 
           git fetch --unshallow origin main
           git checkout $base
-          
-          git merge --squash $head
-          git commit -m "$title" -m "$body"
-          echo "commit_sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-          echo "Squashed commit hash: $(git rev-parse HEAD)"
+          git pull origin $base
 
 
       - name: Show squashed commit
