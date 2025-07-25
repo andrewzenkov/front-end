@@ -59,7 +59,7 @@ jobs:
 
           pr_info='${{ steps.pr.outputs.result }}'
 
-          echo "PR INFO: $pr_info"
+
 
           # Parse the JSON string first, then extract fields
           parsed_json=$(echo "$pr_info" | jq -r '.')
@@ -70,7 +70,9 @@ jobs:
           body=$(echo "$parsed_json" | jq -r '.body')
           mergeCommitSha=$(echo "$parsed_json" | jq -r '.mergeCommitSha')
           isMerged=$(echo "$parsed_json" | jq -r '.isMerged')
-          
+
+          # Need to check if the PR is merged ------ HEEEREEEE -------
+            
           echo "base: $base"
           echo "head: $head"
           echo "title: $title"
@@ -80,7 +82,33 @@ jobs:
 
           git fetch --unshallow origin main
           git checkout $base
- 
+          
+          # Create new branch from patch branch
+          echo "Creating new branch from patch branch..."
+          git fetch origin test-patch:test-patch
+          git checkout test-patch
+          git checkout -b newBranch
+          
+          # Push the new branch
+          git push origin newBranch
+          
+          echo "New branch 'newBranch' created from 'test-patch' branch"
+          
+      - name: Create PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'New branch from test-patch',
+              head: 'newBranch',
+              base: 'test-patch',
+              body: 'This PR was created automatically from the patch branch'
+            });
+
+            console.log('PR created successfully');
+  
       - name: Show squashed commit
         run: |
           git show ${{ steps.squash.outputs.commit_sha }}
