@@ -41,8 +41,9 @@ jobs:
       id: extract
       run: |
         # Debug: Check what we're getting from the API
-
-        echo "Raw PR data:"
+        
+        # Save the data to a file for processing
+        echo "${{ steps.pr.outputs.data }}" > pr.json
         
         # Extract data with error handling
         MERGE_COMMIT=$(jq -r '.merge_commit_sha // "null"' pr.json)
