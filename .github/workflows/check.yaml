@@ -65,10 +65,7 @@ jobs:
 
           git fetch --unshallow origin main
           git checkout $base
-          git merge --squash ${{ steps.pr.outputs.head }}
-          git commit -m "${{ steps.pr.outputs.title }}" -m "${{ steps.pr.outputs.body }}"
-          echo "commit_sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-          echo "Squashed commit hash: $(git rev-parse HEAD)"
+
 
       - name: Show squashed commit
         run: |
