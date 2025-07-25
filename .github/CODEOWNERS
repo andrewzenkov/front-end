@@ -1,0 +1,7 @@
+######## Service Ownership ########
+
+lambdaFunctions/sources/email-send-scheduler/** @landbaseapp/messaging-infrastructure
+lambdaFunctions/sources/email-send-scheduler-user/** @landbaseapp/messaging-infrastructure
+src/campaign/providers/campaign/campaignUser.scheduler.ts @landbaseapp/messaging-infrastructure
+src/campaign/providers/campaign/campaignScheduler.sql.service.ts @landbaseapp/messaging-infrastructure
+src/campaign/providers/campaign/campaign.scheduler.ts @landbaseapp/messaging-infrastructure
