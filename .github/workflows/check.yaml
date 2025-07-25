@@ -56,7 +56,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          echo "base: ${{ steps.pr.outputs }}"
+          echo "base: ${{ steps.pr.outputs.base }}"
 
           git fetch --unshallow origin main
           git checkout ${{ steps.pr.outputs.base }}
