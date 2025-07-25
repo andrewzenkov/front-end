@@ -36,24 +36,12 @@ jobs:
               pull_number: context.issue.number
             });
 
-            console.log({
+            return JSON.stringify({
               base: pr.data.base.ref,
               head: pr.data.head.ref,
               title: pr.data.title,
               body: pr.data.body
-            });
-
-            echo "base=${pr.data.base.ref}" >> $GITHUB_OUTPUT
-            echo "head=${pr.data.head.ref}" >> $GITHUB_OUTPUT
-            echo "title=${pr.data.title}" >> $GITHUB_OUTPUT
-            echo "body=${pr.data.body}" >> $GITHUB_OUTPUT
-
-            return {
-              base: pr.data.base.ref,
-              head: pr.data.head.ref,
-              title: pr.data.title,
-              body: pr.data.body
-            };
+            })
 
       - name: Create squash merge commit
         id: squash
