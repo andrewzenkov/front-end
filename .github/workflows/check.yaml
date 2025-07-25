@@ -36,7 +36,12 @@ jobs:
               pull_number: context.issue.number
             });
 
-            console.log(pr.data);
+            console.log({
+              base: pr.data.base.ref,
+              head: pr.data.head.ref,
+              title: pr.data.title,
+              body: pr.data.body
+            );
 
             return {
               base: pr.data.base.ref,
