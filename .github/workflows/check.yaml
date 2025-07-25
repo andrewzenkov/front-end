@@ -35,11 +35,20 @@ jobs:
               repo: context.repo.repo,
               pull_number: context.issue.number
             });
+            
+            // Get the merge commit if PR is merged
+            let mergeCommitSha = null;
+            if (pr.data.merged_at) {
+              mergeCommitSha = pr.data.merge_commit_sha;
+            }
+            
             return JSON.stringify({
               base: pr.data.base.ref,
               head: pr.data.head.ref,
               title: pr.data.title,
-              body: pr.data.body
+              body: pr.data.body,
+              mergeCommitSha: mergeCommitSha,
+              isMerged: !!pr.data.merged_at
             })
 
       - name: Create squash merge commit
@@ -59,16 +68,19 @@ jobs:
           head=$(echo "$parsed_json" | jq -r '.head')
           title=$(echo "$parsed_json" | jq -r '.title')
           body=$(echo "$parsed_json" | jq -r '.body')
+          mergeCommitSha=$(echo "$parsed_json" | jq -r '.mergeCommitSha')
+          isMerged=$(echo "$parsed_json" | jq -r '.isMerged')
           
           echo "base: $base"
           echo "head: $head"
           echo "title: $title"
           echo "body: $body"
+          echo "isMerged: $isMerged"
+          echo "mergeCommitSha: $mergeCommitSha"
 
           git fetch --unshallow origin main
           git checkout $base
-
-          
+ 
       - name: Show squashed commit
         run: |
           git show ${{ steps.squash.outputs.commit_sha }}
