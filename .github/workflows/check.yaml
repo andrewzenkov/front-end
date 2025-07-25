@@ -91,6 +91,7 @@ jobs:
           git checkout -b newBranch
           
           # Push the new branch
+          git cherry-pick $mergeCommitSha
           git push origin newBranch
           
           echo "New branch 'newBranch' created from 'test-patch' branch"
