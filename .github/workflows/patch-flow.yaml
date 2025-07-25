@@ -40,21 +40,43 @@ jobs:
     - name: Parse PR merge commit SHA
       id: extract
       run: |
+        # Debug: Check what we're getting from the API
+        echo "Raw PR data:"
+        echo "${{ steps.pr.outputs.data }}"
+        
+        # Save the data and validate JSON
         echo "${{ steps.pr.outputs.data }}" > pr.json
-
-        MERGE_COMMIT=$(jq -r .merge_commit_sha pr.json)
-        PR_NUMBER=$(jq -r .number pr.json)
+        
+        # Check if the JSON is valid
+        if ! jq empty pr.json 2>/dev/null; then
+          echo "Error: Invalid JSON received from API"
+          cat pr.json
+          exit 1
+        fi
+        
+        # Extract data with error handling
+        MERGE_COMMIT=$(jq -r '.merge_commit_sha // "null"' pr.json)
+        PR_NUMBER=$(jq -r '.number // "unknown"' pr.json)
+        
+        echo "Debug: MERGE_COMMIT=$MERGE_COMMIT"
+        echo "Debug: PR_NUMBER=$PR_NUMBER"
         
         # For squash merges, merge_commit_sha is null, so we need to get the squashed commit
         if [ "$MERGE_COMMIT" = "null" ]; then
+          echo "Detected squash merge, getting base branch info..."
           # Get the squashed commit SHA by looking at the base branch's latest commit
-          BASE_BRANCH=$(jq -r .base.ref pr.json)
+          BASE_BRANCH=$(jq -r '.base.ref // "main"' pr.json)
           echo "base_branch=$BASE_BRANCH" >> $GITHUB_OUTPUT
           
           # Get the latest commit on the base branch (this is the squashed commit)
-          echo "${{ steps.base_commit.outputs.data }}" > base_commit.json
-          SQUASHED_COMMIT=$(jq -r .sha base_commit.json)
-          echo "merge_commit=$SQUASHED_COMMIT" >> $GITHUB_OUTPUT
+          if [ -n "${{ steps.base_commit.outputs.data }}" ]; then
+            echo "${{ steps.base_commit.outputs.data }}" > base_commit.json
+            SQUASHED_COMMIT=$(jq -r '.sha // "unknown"' base_commit.json)
+            echo "merge_commit=$SQUASHED_COMMIT" >> $GITHUB_OUTPUT
+          else
+            echo "Error: No base commit data available"
+            exit 1
+          fi
         else
           echo "merge_commit=$MERGE_COMMIT" >> $GITHUB_OUTPUT
         fi
