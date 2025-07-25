@@ -52,10 +52,13 @@ jobs:
 
           echo "PR INFO: $pr_info"
 
-          base=$(echo "$pr_info" | jq -r '.base')
-          head=$(echo "$pr_info" | jq -r '.head')
-          title=$(echo "$pr_info" | jq -r '.title')
-          body=$(echo "$pr_info" | jq -r '.body')
+          # Parse the JSON string first, then extract fields
+          parsed_json=$(echo "$pr_info" | jq -r '.')
+          
+          base=$(echo "$parsed_json" | jq -r '.base')
+          head=$(echo "$parsed_json" | jq -r '.head')
+          title=$(echo "$parsed_json" | jq -r '.title')
+          body=$(echo "$parsed_json" | jq -r '.body')
           
           echo "base: $base"
           echo "head: $head"
@@ -64,6 +67,8 @@ jobs:
 
           git fetch --unshallow origin main
           git checkout $base
+
+          
       - name: Show squashed commit
         run: |
           git show ${{ steps.squash.outputs.commit_sha }}
