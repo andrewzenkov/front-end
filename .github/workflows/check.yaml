@@ -1,0 +1,51 @@
+name: Show Squashed Merge Commit on PR Comment
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  show-squash-commit:
+    if: github.event.issue.pull_request != null && contains(github.event.comment.body, '/show-squash-commit')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: refs/pull/${{ github.event.issue.number }}/head
+
+      - name: Fetch base branch
+        run: |
+          git fetch origin ${{ github.event.pull_request.base.ref }}:${{ github.event.pull_request.base.ref }}
+
+      - name: Get PR info
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+            return {
+              base: pr.data.base.ref,
+              head: pr.data.head.ref,
+              title: pr.data.title,
+              body: pr.data.body
+            };
+
+      - name: Create squash merge commit
+        id: squash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout ${{ steps.pr.outputs.base }}
+          git merge --squash ${{ steps.pr.outputs.head }}
+          git commit -m "${{ steps.pr.outputs.title }}" -m "${{ steps.pr.outputs.body }}"
+          echo "commit_sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+          echo "Squashed commit hash: $(git rev-parse HEAD)"
+
+      - name: Show squashed commit
+        run: |
+          git show ${{ steps.squash.outputs.commit_sha }}
