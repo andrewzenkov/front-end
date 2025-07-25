@@ -6,7 +6,9 @@ on:
 
 jobs:
   show-squash-commit:
-    if: github.event.issue.pull_request != null && contains(github.event.comment.body, '/deploy hotfix')
+    if: |
+      github.event.issue.pull_request != null &&
+      startsWith(github.event.comment.body, 'deploy')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout PR branch
